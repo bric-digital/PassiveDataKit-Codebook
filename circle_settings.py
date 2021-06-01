@@ -42,7 +42,7 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'passive_data_kit_external_data.circle_urls'
+ROOT_URLCONF = 'passive_data_kit_codebook.circle_urls'
 
 TEMPLATES = [
     {
