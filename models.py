@@ -7,6 +7,7 @@ import json
 import traceback
 
 import markdown
+import six
 
 from deepdiff import DeepDiff
 
@@ -22,7 +23,7 @@ def update_definition_primitive(definition, value, path):
         definition[path]['types'].append('real')
     elif isinstance(value, int) and ('integer' in definition[path]['types']) is False:
         definition[path]['types'].append('integer')
-    if isinstance(value, (str, unicode)) and ('string' in definition[path]['types']) is False:
+    if isinstance(value, six.string_types) and ('string' in definition[path]['types']) is False:
         definition[path]['types'].append('string')
 
     if isinstance(value, (int, float)) and (('real' in definition[path]['types']) or ('integer' in definition[path]['types'])):
@@ -35,7 +36,7 @@ def update_definition_primitive(definition, value, path):
             if value > definition[path]['range'][1]:
                 definition[path]['range'][1] = value
 
-    if isinstance(value, (str, unicode)) and ('string' in definition[path]['types']):
+    if isinstance(value, six.string_types) and ('string' in definition[path]['types']):
         if ('observed' in definition[path]) is False:
             definition[path]['observed'] = []
 
@@ -79,7 +80,7 @@ def update_definition(definition, element, prefix=None): # pylint: disable=too-m
                 existing_def['types'].append('list')
 
             for item in value:
-                if isinstance(item, (float, str, unicode, int)):
+                if isinstance(item, (float, int, six.string_types)):
                     update_definition_primitive(definition, value, path + '[]')
                 elif isinstance(item, dict):
                     update_definition(definition, item, prefix=(path + '[].'))
@@ -88,7 +89,7 @@ def update_definition(definition, element, prefix=None): # pylint: disable=too-m
                 else:
                     print(u'UKNKOWN IN LIST[{}]: {} ({})'.format(path, item, type(item)))
 
-        elif isinstance(value, (float, str, unicode, int)):
+        elif isinstance(value, (float, int, six.string_types)):
             update_definition_primitive(definition, value, path)
         else:
             print(u'UNKNOWN ITEM[{}]: {}'.format(path, value))
@@ -105,7 +106,7 @@ class DataPointType(models.Model):
     last_seen = models.DateTimeField(null=True, blank=True)
 
     def markdown(self):
-        return mark_safe(markdown.markdown(self.description))
+        return mark_safe(markdown.markdown(self.description)) # nosec
 
     def get_absolute_url(self):
         return reverse('pdk_codebook_page', args=[self.generator])
@@ -142,12 +143,24 @@ class DataPointType(models.Model):
 
         to_delete = []
 
+<<<<<<< HEAD
         if 'type_changes' in diff:
             for key in diff['type_changes']:
                 if diff['type_changes'][key]['new_type'] == str and diff['type_changes'][key]['old_type'] == unicode:
                     to_delete.append(key)
                 elif diff['type_changes'][key]['new_type'] == unicode and diff['type_changes'][key]['old_type'] == str:
                     to_delete.append(key)
+=======
+        python_version = sys.version_info[0]
+
+        if 'type_changes' in diff:
+            for key in diff['type_changes']:
+                if python_version >= 3:
+                    if diff['type_changes'][key]['new_type'] == str and diff['type_changes'][key]['old_type'] == unicode: # pylint: disable=undefined-variable
+                        to_delete.append(key)
+                    elif diff['type_changes'][key]['new_type'] == unicode and diff['type_changes'][key]['old_type'] == str: # pylint: disable=undefined-variable
+                        to_delete.append(key)
+>>>>>>> 69ffbebcccd6a990bfd2c8d445fd01bc5b410f07
 
         for key in to_delete:
             del diff['type_changes'][key]

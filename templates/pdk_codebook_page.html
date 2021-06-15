@@ -3,72 +3,74 @@
 {% load passive_data_kit %}
 
 {% block sidebar %}
-	<ul class="nav nav-sidebar">
-		<li>(Types here...)</li>
-	</ul>
+    <ul class="nav nav-sidebar">
+        {% for other_type in data_types %}
+            <li><a href="{{ other_type.get_absolute_url }}">{{ other_type.generator }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block content %}
-	<div class="row">
-		<div class="col-md-12">
-			<h1 class="sub-header">{{ data_type.generator }}</h1> 
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="sub-header">{{ data_type.generator }}</h1> 
+        </div>
+    </div>
 
-	<div class="row">
-		<div class="col-md-12">
-			<h3 class="sub-header">Description</h3> 
-		</div>
-		<div class="col-md-12">
-			(Description here...)
-		</div>
-	</div>
-	
-	<div class="row">
-		<div class="col-md-12">
-			<h3 class="sub-header"><a name="data_collection"></a>Summary</h3> 
-		</div>
-		<div class="col-md-12">
-			<table class="table">
-				<thead>
-					<tr>
-						<th scope="col">Variable</th>
-						<th scope="col">Description</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for variable in data_type.ordered_variables %}
-					<tr>
-						<th scope="row">
-							<a href="#{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a><br />
-							{{ variable.pdk_codebook_key }}
-						</th>
-						<td>{{ variable.pdk_variable_description }}</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="sub-header">Description</h3> 
+        </div>
+        <div class="col-md-12">
+            {{ data_type.markdown }}
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="sub-header"><a name="data_collection"></a>Summary</h3> 
+        </div>
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Variable</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for variable in data_type.ordered_variables %}
+                    <tr>
+                        <th scope="row">
+                            <a href="#{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a><br />
+                            {{ variable.pdk_codebook_key }}
+                        </th>
+                        <td>{{ variable.pdk_variable_description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-	<div class="row">
-		<div class="col-md-12">
-			<h3 class="sub-header"><a name="data_collection"></a>Details</h3> 
-		</div>
-		<div class="col-md-12">
-			{% for variable in data_type.ordered_variables %}
-				<h3><a name="{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a></h3>
-				<h4>{{ variable.pdk_codebook_key }}</h4>
-				
-				{{ variable.pdk_variable_description|linebreaks }}
-				
-				<div>
-					<pre>{{ variable.pdk_codebook_json }}</pre>
-				</div>
-			</tr>
-			{% endfor %}
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="sub-header"><a name="data_collection"></a>Details</h3> 
+        </div>
+        <div class="col-md-12">
+            {% for variable in data_type.ordered_variables %}
+                <h3><a name="{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a></h3>
+                <h4>{{ variable.pdk_codebook_key }}</h4>
+                
+                {{ variable.pdk_variable_description|linebreaks }}
+                
+                <div>
+                    <pre>{{ variable.pdk_codebook_json }}</pre>
+                </div>
+            </tr>
+            {% endfor %}
+        </div>
+    </div>
 
-	<script data-main="{% static 'pdk_codebook/js/codebook_page.js' %}" src="{% static 'pdk/js/lib/require.js' %}"></script>
+    <script data-main="{% static 'pdk_codebook/js/codebook_page.js' %}" src="{% static 'pdk/js/lib/require.js' %}"></script>
 {% endblock %}

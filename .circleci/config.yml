@@ -40,15 +40,15 @@ jobs:
             mv ../passive_data_kit_codebook pdk
             cd pdk
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
-            cp passive_data_kit_content_analysis/circle_settings.py pdk/settings.py
+            cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
             python manage.py migrate
             python manage.py test
-            cp passive_data_kit_content_analysis/.pylintrc .
+            cp passive_data_kit_codebook/.pylintrc .
             pylint passive_data_kit
             pylint passive_data_kit_codebook
             bandit -r .      
       - save_cache:
-          key: venv-38-{{ .Branch }}-{{ checksum "/home/circleci/django/pdk/passive_data_kit_content_analysis/requirements.txt" }}
+          key: venv-38-{{ .Branch }}-{{ checksum "/home/circleci/django/pdk/passive_data_kit_codebook/requirements.txt" }}
           paths:
             - "/home/circleci/venv"
       - store_test_results:
@@ -95,7 +95,7 @@ jobs:
             pylint passive_data_kit_codebook
             bandit -r .      
       - save_cache:
-          key: venv-27-{{ .Branch }}-{{ checksum "/home/circleci/django/pdk/passive_data_kit_content_analysis/requirements.txt" }}
+          key: venv-27-{{ .Branch }}-{{ checksum "/home/circleci/django/pdk/passive_data_kit_codebook/requirements.txt" }}
           paths:
             - "/home/circleci/venv"
       - store_test_results:
@@ -103,4 +103,3 @@ jobs:
       - store_artifacts:
           path: test-reports/
           destination: python_app
-
