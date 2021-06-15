@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 
 import importlib
 import json
+import sys
 import traceback
 
 import markdown
@@ -143,14 +144,6 @@ class DataPointType(models.Model):
 
         to_delete = []
 
-<<<<<<< HEAD
-        if 'type_changes' in diff:
-            for key in diff['type_changes']:
-                if diff['type_changes'][key]['new_type'] == str and diff['type_changes'][key]['old_type'] == unicode:
-                    to_delete.append(key)
-                elif diff['type_changes'][key]['new_type'] == unicode and diff['type_changes'][key]['old_type'] == str:
-                    to_delete.append(key)
-=======
         python_version = sys.version_info[0]
 
         if 'type_changes' in diff:
@@ -160,7 +153,6 @@ class DataPointType(models.Model):
                         to_delete.append(key)
                     elif diff['type_changes'][key]['new_type'] == unicode and diff['type_changes'][key]['old_type'] == str: # pylint: disable=undefined-variable
                         to_delete.append(key)
->>>>>>> 69ffbebcccd6a990bfd2c8d445fd01bc5b410f07
 
         for key in to_delete:
             del diff['type_changes'][key]
