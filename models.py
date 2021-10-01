@@ -28,7 +28,7 @@ def update_definition_primitive(definition, value, path):
         definition[path]['types'].append('string')
 
     if isinstance(value, (int, float)) and (('real' in definition[path]['types']) or ('integer' in definition[path]['types'])):
-        if ('range' in definition) is False:
+        if ('range' in definition[path]) is False:
             definition[path]['range'] = [value, value]
         else:
             if value < definition[path]['range'][0]:
@@ -112,17 +112,32 @@ class DataPointType(models.Model):
     def get_absolute_url(self):
         return reverse('pdk_codebook_page', args=[self.generator])
 
-    def update_definition(self, sample=25, override_existing=False): # pylint: disable=unused-argument
+    def update_definition(self, sample=0, override_existing=False): # pylint: disable=unused-argument, too-many-locals, too-many-branches
         definition = json.loads(self.definition)
 
         data_generator = DataGeneratorDefinition.definition_for_identifier(self.generator)
 
-        point_query = DataPoint.objects.filter(generator_definition=data_generator)[:sample]
+        point_query = DataPoint.objects.filter(generator_definition=data_generator)
+
+        if sample > 0:
+            point_query = point_query[:sample]
+
+        min_date = None
+        max_date = None
 
         for point in point_query:
             point_def = point.fetch_properties()
 
-            update_definition(definition, point_def)
+            if 'passive-data-metadata' in point_def and 'generator-id' in point_def['passive-data-metadata']:
+                update_definition(definition, point_def)
+
+                if min_date is None or point.created < min_date:
+                    min_date = point.created
+
+                if max_date is None or point.created > min_date:
+                    max_date = point.created
+            else:
+                print('[Error] Point pk=' + str(point.pk) + ' missing basic PDK metadata.')
 
         original_definition = json.loads(self.definition)
 
@@ -130,7 +145,10 @@ class DataPointType(models.Model):
             try:
                 pdk_api = importlib.import_module(app + '.pdk_api')
 
-                pdk_api.update_data_type_definition(definition)
+                if 'passive-data-metadata.generator-id' in definition:
+                    pdk_api.update_data_type_definition(definition)
+                else:
+                    print('[Error] Definition missing basic PDK metadata: ' + json.dumps(definition, indent=2))
             except ImportError:
                 pass
             except AttributeError:
@@ -140,7 +158,7 @@ class DataPointType(models.Model):
 
         diff = DeepDiff(original_definition, definition)
 
-        print(self.generator + ': ' + json.dumps(definition, indent=2))
+        # print(self.generator + ': ' + json.dumps(definition, indent=2))
 
         to_delete = []
 
@@ -157,9 +175,16 @@ class DataPointType(models.Model):
         for key in to_delete:
             del diff['type_changes'][key]
 
-        print(diff)
+        # print(diff)
 
         self.definition = json.dumps(definition, indent=2)
+
+        if self.first_seen is None or min_date < self.first_seen:
+            self.first_seen = min_date
+
+        if self.last_seen is None or max_date < self.last_seen:
+            self.last_seen = max_date
+
         self.save()
 
     def ordered_variables(self):
@@ -187,3 +212,42 @@ class DataPointType(models.Model):
         ordered_variables.extend(unordered_variables)
 
         return ordered_variables
+
+    def variable_groups(self):
+        definition = json.loads(self.definition)
+
+        group_names = []
+
+        groups = {
+            'Other Variables': []
+        }
+
+        for key in definition:
+            variable = definition[key]
+
+            variable['pdk_codebook_json'] = json.dumps(variable, indent=2)
+
+            variable['pdk_codebook_key'] = key
+
+            if 'pdk_codebook_group' in variable:
+                if (variable['pdk_codebook_group'] in groups) is False:
+                    groups[variable['pdk_codebook_group']] = []
+                    group_names.append(variable['pdk_codebook_group'])
+
+                groups[variable['pdk_codebook_group']].append(variable)
+            else:
+                groups['Other Variables'].append(variable)
+
+        group_names.sort()
+
+        group_names.append('Other Variables')
+
+        sorted_list = []
+
+        for name in group_names:
+            if groups[name]:
+                groups[name].sort(key=lambda variable: variable.get('pdk_codebook_order', sys.maxsize))
+
+                sorted_list.append((name, groups[name]))
+
+        return sorted_list

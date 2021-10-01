@@ -26,51 +26,93 @@
         </div>
     </div>
     
-    <div class="row">
-        <div class="col-md-12">
-            <h3 class="sub-header"><a name="data_collection"></a>Summary</h3> 
-        </div>
-        <div class="col-md-12">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Variable</th>
-                        <th scope="col">Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for variable in data_type.ordered_variables %}
-                    <tr>
-                        <th scope="row">
-                            <a href="#{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a><br />
-                            {{ variable.pdk_codebook_key }}
-                        </th>
-                        <td>{{ variable.pdk_variable_description }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    {% for group in data_type.variable_groups %}
+		<div class="row">
+			<div class="col-md-12">
+				<h3 class="sub-header"><a name="data_collection"></a>Summary - {{ group.0 }}</h3> 
+			</div>
+			<div class="col-md-12">
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col" style="width: 30%;">Variable</th>
+							<th scope="col">Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for variable in group.1 %}
+						<tr>
+							<th scope="row">
+								<a href="#{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a><br />
+								{{ variable.pdk_codebook_key }}
+							</th>
+							<td>{{ variable.pdk_variable_description }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{% endfor %}
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3 class="sub-header"><a name="data_collection"></a>Details</h3> 
-        </div>
-        <div class="col-md-12">
-            {% for variable in data_type.ordered_variables %}
-                <h3><a name="{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a></h3>
-                <h4>{{ variable.pdk_codebook_key }}</h4>
-                
-                {{ variable.pdk_variable_description|linebreaks }}
-                
-                <div>
-                    <pre>{{ variable.pdk_codebook_json }}</pre>
-                </div>
-            </tr>
-            {% endfor %}
-        </div>
-    </div>
+
+    {% for group in data_type.variable_groups %}
+		<div class="row">
+			<div class="col-md-12">
+				<h3 class="sub-header"><a name="data_collection"></a>Details  - {{ group.0 }}</h3> 
+			</div>
+			{% for variable in group.1 %}
+				<div class="col-md-12">
+					<h4><a name="{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a></h4>
+					<h5>{{ variable.pdk_codebook_key }}</h5>
+			
+					{{ variable.pdk_variable_description|linebreaks }}
+					
+					{% if variable.is_freetext %}
+						<p><strong>Free-text string, not constrained to any particular set of implicit values.</strong><p>
+					{% else %}
+						{% if variable.is_constant %}
+							<p><strong>Constant value ({{ variable.constant_value }}), does not change.</strong><p>
+						{% else %}
+							{% if 'string' in variable.types %}
+								<p><strong>Text value, observed values:</strong><p>
+								<ul>
+									{% for value in variable.observed %}
+										<li>{{ value }}</li>
+									{% endfor %}
+								</ul>
+							{% else %}
+								{% if 'timestamp' in variable.types %}
+									<p><strong>Timestamp, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
+								{% else %}
+									{% if variable.range %}
+										<p><strong>Numeric value, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
+									{% else %}
+										{% if variable.pdk_labelled_ranges %}
+											<p><strong>Scored values, observed ranges:</strong><p>
+											<ul>
+												{% for range in variable.pdk_labelled_ranges %}
+													<li>{{ range.0 }}: {{ range.1.0 }} to {{ range.1.1 }}</li>
+												{% endfor %}
+											</ul>
+										{% else %}
+											{% if variable.pdk_labelled_ranges != None %}
+												<p><strong>Unable to score provided content. No score ranges available.</strong><p>
+											{% else %}
+												<div>
+													<pre>{{ variable.pdk_codebook_json }}</pre>
+												</div>
+											{% endif %}
+										{% endif %}
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					{% endif %}
+				</div>
+			{% endfor %}
+	    </div>
+	{% endfor %}
 
     <script data-main="{% static 'pdk_codebook/js/codebook_page.js' %}" src="{% static 'pdk/js/lib/require.js' %}"></script>
 {% endblock %}

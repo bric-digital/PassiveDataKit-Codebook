@@ -16,7 +16,7 @@ def pdk_codebook_page(request, generator):
 
     context = {
         'data_type': data_type,
-        'data_types': DataPointType.objects.all().order_by('generator')
+        'data_types': DataPointType.objects.exclude(first_seen=None).order_by('generator')
     }
 
     return render(request, 'pdk_codebook_page.html', context=context)

@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
         parser.add_argument('--sample',
                             type=int,
-                            default=25,
+                            default=0,
                             help='Number of points to sample to construct definition.')
 
     @handle_lock
@@ -28,4 +28,6 @@ class Command(BaseCommand):
             query = DataPointType.objects.filter(generator=options['identifier'])
 
         for point_type in query:
+            print('Updating ' + point_type.generator + '...')
+
             point_type.update_definition(sample=options['sample'])
