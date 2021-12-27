@@ -3,7 +3,6 @@ arrow==0.17.0; python_version >= '3.0'
 bandit==1.7.0; python_version >= '3.0'
 bandit==1.6.2; python_version < '3.0'
 bcrypt==3.1.7
-beautifulsoup4==4.8.2
 boto==2.49.0
 boto3==1.20.26; python_version >= '3.0'
 boto3==1.17.112; python_version < '3.0'
@@ -63,7 +62,7 @@ soupsieve==1.9.5
 sphinx-me==0.3
 standardjson==0.3.1
 stevedore==1.32.0
-urllib3==1.25.10
+urllib3==1.26.7
 whitenoise==4.1.2
 XlsxWriter==2.0.0; python_version < '3.4'
 XlsxWriter==3.0.1; python_version >= '3.4'
