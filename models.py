@@ -86,14 +86,14 @@ def update_definition(definition, element, prefix=None): # pylint: disable=too-m
                 elif isinstance(item, dict):
                     update_definition(definition, item, prefix=(path + '[].'))
                 elif isinstance(item, list):
-                    print(u'LIST WITHIN LIST[{}]: {} ({})'.format(path, item, type(item)))
+                    print('LIST WITHIN LIST[{}]: {} ({})'.format(path, item, type(item)))
                 else:
-                    print(u'UKNKOWN IN LIST[{}]: {} ({})'.format(path, item, type(item)))
+                    print('UKNKOWN IN LIST[{}]: {} ({})'.format(path, item, type(item)))
 
         elif isinstance(value, (float, int, six.string_types)):
             update_definition_primitive(definition, value, path)
         else:
-            print(u'UNKNOWN ITEM[{}]: {}'.format(path, value))
+            print('UNKNOWN ITEM[{}]: {}'.format(path, value))
 
 
 class DataPointType(models.Model):
