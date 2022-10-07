@@ -31,7 +31,7 @@ jobs:
             sudo apt-get update && sudo apt-get install -y gdal-bin
             python3 -m venv --copies /home/circleci/venv
             . /home/circleci/venv/bin/activate
-            pip install -r requirements.txt --progress-bar off
+            pip install -r requirements.txt
             cd ..
             mv project passive_data_kit_codebook
             mkdir django
@@ -40,13 +40,13 @@ jobs:
             mv ../passive_data_kit_codebook pdk
             cd pdk
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
-            pip install -r passive_data_kit/requirements.txt --progress-bar off
+            cp passive_data_kit_codebook/.pylintrc .
             cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pylint passive_data_kit_codebook
+            pip install -r passive_data_kit/requirements.txt
+            pip install -r passive_data_kit_codebook/requirements.txt
             python manage.py migrate
             python manage.py test
-            cp passive_data_kit_codebook/.pylintrc .
-            pylint passive_data_kit_codebook
-            pip install -r passive_data_kit/requirements.txt --progress-bar off
             pylint passive_data_kit
             bandit -r .      
       - save_cache:
@@ -80,7 +80,7 @@ jobs:
             sudo apt-get update && sudo apt-get install -y gdal-bin
             virtualenv --copies /home/circleci/venv
             . /home/circleci/venv/bin/activate
-            pip install -r requirements.txt --progress-bar off
+            pip install -r requirements.txt
             cd ..
             mv project passive_data_kit_codebook
             mkdir django
@@ -89,12 +89,13 @@ jobs:
             mv ../passive_data_kit_codebook pdk
             cd pdk
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
+            cp passive_data_kit_codebook/.pylintrc .
             cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pylint passive_data_kit_codebook
+            pip install -r passive_data_kit/requirements.txt
+            pip install -r passive_data_kit_codebook/requirements.txt
             python manage.py migrate
             python manage.py test
-            cp passive_data_kit_codebook/.pylintrc .
-            pylint passive_data_kit_codebook
-            pip install -r passive_data_kit/requirements.txt --progress-bar off
             pylint passive_data_kit
             bandit -r .      
       - save_cache:
