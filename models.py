@@ -75,7 +75,7 @@ def update_definition(definition, element, prefix=None): # pylint: disable=too-m
             if ('object' in existing_def['types']) is False:
                 existing_def['types'].append('object')
 
-            update_definition(definition, value, prefix=(path + '.'))
+            update_definition(definition, value, prefix=(path + '.')) # pylint: disable=superfluous-parens
         elif isinstance(value, list):
             if ('list' in existing_def['types']) is False:
                 existing_def['types'].append('list')
@@ -84,7 +84,7 @@ def update_definition(definition, element, prefix=None): # pylint: disable=too-m
                 if isinstance(item, (float, int, six.string_types)):
                     update_definition_primitive(definition, value, path + '[]')
                 elif isinstance(item, dict):
-                    update_definition(definition, item, prefix=(path + '[].'))
+                    update_definition(definition, item, prefix=(path + '[].')) # pylint: disable=superfluous-parens
                 elif isinstance(item, list):
                     print('LIST WITHIN LIST[{}]: {} ({})'.format(path, item, type(item)))
                 else:
