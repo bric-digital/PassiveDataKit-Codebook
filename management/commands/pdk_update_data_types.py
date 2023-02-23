@@ -20,6 +20,11 @@ class Command(BaseCommand):
                             default=0,
                             help='Number of points to sample to construct definition.')
 
+        parser.add_argument('--override',
+                            action='store_true',
+                            default=False,
+                            help='Whether to completely overwrite or update definition.')
+
     @handle_lock
     def handle(self, *args, **options):
         query = DataPointType.objects.all()
@@ -28,6 +33,6 @@ class Command(BaseCommand):
             query = DataPointType.objects.filter(generator=options['identifier'])
 
         for point_type in query:
-            print('Updating ' + point_type.generator + '...')
+            print('Updating %s (%s)...' % (point_type.generator, options['override']))
 
-            point_type.update_definition(sample=options['sample'])
+            point_type.update_definition(sample=options['sample'], override_existing=options['override'])

@@ -1,6 +1,7 @@
 {% extends "pdk_base.html" %}
 {% load static from staticfiles %}
 {% load passive_data_kit %}
+{% load passive_data_kit_codebook %}
 
 {% block sidebar %}
     <ul class="nav nav-sidebar">
@@ -29,14 +30,14 @@
     {% for group in data_type.variable_groups %}
 		<div class="row">
 			<div class="col-md-12">
-				<h3 class="sub-header"><a name="data_collection"></a>Summary - {{ group.0 }}</h3> 
+				<h3 class="sub-header"><a name="data_collection"></a>{{ group.0 }}</h3> 
 			</div>
 			<div class="col-md-12">
 				<table class="table">
 					<thead>
 						<tr>
-							<th scope="col" style="width: 30%;">Variable</th>
-							<th scope="col">Description</th>
+							<th scope="col">Variable</th>
+							<th scope="col" style="max-width: 50%;">Description</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -46,7 +47,13 @@
 								<a href="#{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a><br />
 								{{ variable.pdk_codebook_key }}
 							</th>
-							<td>{{ variable.pdk_variable_description }}</td>
+							<td>
+								{% if variable.pdk_variable_summary %}
+									{{ variable.pdk_variable_summary }}
+								{% else %}
+									{{ variable.pdk_variable_description }}
+								{% endif %}
+							</td>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -66,7 +73,7 @@
 					<h4><a name="{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a></h4>
 					<h5>{{ variable.pdk_codebook_key }}</h5>
 			
-					{{ variable.pdk_variable_description|linebreaks }}
+					{{ variable.pdk_variable_description|codebook_markdown }}
 					
 					{% if variable.is_freetext %}
 						<p><strong>Free-text string, not constrained to any particular set of implicit values.</strong><p>
@@ -75,33 +82,46 @@
 							<p><strong>Constant value ({{ variable.constant_value }}), does not change.</strong><p>
 						{% else %}
 							{% if 'string' in variable.types %}
-								<p><strong>Text value, observed values:</strong><p>
-								<ul>
-									{% for value in variable.observed %}
-										<li>{{ value }}</li>
-									{% endfor %}
-								</ul>
+								{% if variable.examples %}
+									<p><strong>Text value, example values (not exhaustive):</strong><p>
+									<ul>
+										{% for value in variable.examples %}
+											<li>{{ value }}</li>
+										{% endfor %}
+									</ul>
+								{% else %}
+									<p><strong>Text value, observed values (exhaustive):</strong><p>
+									<ul>
+										{% for value in variable.observed %}
+											<li>{{ value }}</li>
+										{% endfor %}
+									</ul>
+								{% endif %}
 							{% else %}
 								{% if 'timestamp' in variable.types %}
 									<p><strong>Timestamp, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
 								{% else %}
-									{% if variable.range %}
-										<p><strong>Numeric value, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
+									{% if 'file' in variable.types %}
+										<p><strong>Binary file data</strong><p>
 									{% else %}
-										{% if variable.pdk_labelled_ranges %}
-											<p><strong>Scored values, observed ranges:</strong><p>
-											<ul>
-												{% for range in variable.pdk_labelled_ranges %}
-													<li>{{ range.0 }}: {{ range.1.0 }} to {{ range.1.1 }}</li>
-												{% endfor %}
-											</ul>
+										{% if variable.range %}
+											<p><strong>Numeric value, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
 										{% else %}
-											{% if variable.pdk_labelled_ranges != None %}
-												<p><strong>Unable to score provided content. No score ranges available.</strong><p>
+											{% if variable.pdk_labelled_ranges %}
+												<p><strong>Scored values, observed ranges:</strong><p>
+												<ul>
+													{% for range in variable.pdk_labelled_ranges %}
+														<li>{{ range.0 }}: {{ range.1.0 }} to {{ range.1.1 }}</li>
+													{% endfor %}
+												</ul>
 											{% else %}
-												<div>
-													<pre>{{ variable.pdk_codebook_json }}</pre>
-												</div>
+												{% if variable.pdk_labelled_ranges != None %}
+													<p><strong>Unable to score provided content. No score ranges available.</strong><p>
+												{% else %}
+													<div>
+														<pre>{{ variable.pdk_codebook_json }}</pre>
+													</div>
+												{% endif %}
 											{% endif %}
 										{% endif %}
 									{% endif %}
