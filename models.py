@@ -146,7 +146,7 @@ class DataPointType(models.Model):
                 pdk_api = importlib.import_module(app + '.pdk_api')
 
                 if 'passive-data-metadata.generator-id' in definition:
-                    pdk_api.update_data_type_definition(definition)
+                    pdk_api.update_data_type_definition(definition, override_existing=override_existing)
                 else:
                     print('[Error] Definition missing basic PDK metadata: ' + json.dumps(definition, indent=2))
             except ImportError:
