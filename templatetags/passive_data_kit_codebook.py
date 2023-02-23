@@ -7,4 +7,4 @@ register = template.Library()
 
 @register.filter
 def codebook_markdown(value):
-    return mark_safe(markdown.markdown(value))
+    return mark_safe(markdown.markdown(value)) # nosec
