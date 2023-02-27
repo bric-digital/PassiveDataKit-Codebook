@@ -13,7 +13,7 @@ Markdown==3.3.7; python_version == '3.6'
 Markdown==3.4.1; python_version >= '3.7'
 six==1.16.0
 deepdiff==3.3.0; python_version < '3.0'
-deepdiff==5.7.0; python_version > '3.0'
+deepdiff==6.2.3; python_version > '3.0'
 # Problems below with ordered-set dependency for deepdiff
 # deepdiff==5.8.1; python_version == '3.6'
 # deepdiff==6.2.3; python_version >= '3.7'
