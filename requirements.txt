@@ -13,5 +13,5 @@ Markdown==3.3.7; python_version == '3.6'
 Markdown==3.4.3; python_version >= '3.7'
 six==1.16.0
 deepdiff==3.3.0; python_version < '3.0'
-deepdiff==5.7.0; python_version == '3.6'
+deepdiff==6.3.0; python_version == '3.6'
 deepdiff==6.3.0; python_version >= '3.7'
