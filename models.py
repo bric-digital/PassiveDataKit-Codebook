@@ -19,7 +19,22 @@ from django.utils.safestring import mark_safe
 
 from passive_data_kit.models import DataGeneratorDefinition, DataPoint
 
-def update_definition_primitive(definition, value, path):
+def update_definition_primitive(definition, value, path): # pylint: disable=too-many-branches
+    if path.endswith('[]'):
+        clean_path = path[:-2]
+
+        existing_list = definition.get(clean_path, {}).get('observed', [])
+
+        if (value in existing_list) is False:
+            if isinstance(value, (float, int, six.string_types)):
+                existing_list.append(value)
+            else:
+                existing_list.append('Unknown type: %s' % value)
+
+            definition[clean_path]['observed'] = existing_list
+
+        return
+
     if isinstance(value, float) and ('real' in definition[path]['types']) is False:
         definition[path]['types'].append('real')
     elif isinstance(value, int) and ('integer' in definition[path]['types']) is False:
@@ -82,7 +97,7 @@ def update_definition(definition, element, prefix=None): # pylint: disable=too-m
 
             for item in value:
                 if isinstance(item, (float, int, six.string_types)):
-                    update_definition_primitive(definition, value, path + '[]')
+                    update_definition_primitive(definition, item, path + '[]')
                 elif isinstance(item, dict):
                     update_definition(definition, item, prefix=(path + '[].')) # pylint: disable=superfluous-parens
                 elif isinstance(item, list):
@@ -112,7 +127,7 @@ class DataPointType(models.Model):
     def get_absolute_url(self):
         return reverse('pdk_codebook_page', args=[self.generator])
 
-    def update_definition(self, sample=0, override_existing=False): # pylint: disable=unused-argument, too-many-locals, too-many-branches
+    def update_definition(self, sample=0, override_existing=False): # pylint: disable=unused-argument, too-many-locals, too-many-branches, too-many-statements
         definition = json.loads(self.definition)
 
         data_generator = DataGeneratorDefinition.definition_for_identifier(self.generator)
@@ -155,6 +170,11 @@ class DataPointType(models.Model):
                 pass
             except: #pylint: disable=bare-except
                 traceback.print_exc()
+
+        if 'pdk_description' in definition:
+            self.description = definition.get('pdk_description', '')
+
+            del definition['pdk_description']
 
         diff = DeepDiff(original_definition, definition)
 
