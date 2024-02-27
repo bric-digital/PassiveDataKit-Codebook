@@ -100,6 +100,12 @@
 							{% else %}
 								{% if 'object' in variable.types %}
 									<p><strong>Arbitrary data structure, expressed as a JSON object.</strong><p>
+
+									{% if variable.example %}
+										<p><strong>Example:</strong><p>
+										
+										<pre>{{ variable.example }}</pre>
+									{% endif %}
 								{% else %}
 									{% if 'list' in variable.types %}
 										<p><strong>List, observed values (exhaustive):</strong><p>
