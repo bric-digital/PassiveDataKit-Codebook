@@ -1,4 +1,9 @@
-from django.conf.urls import url
+import sys
+
+if sys.version_info[0] > 2:
+    from django.urls import re_path as url # pylint: disable=no-name-in-module
+else:
+    from django.conf.urls import url
 
 from .views import pdk_codebook_page, pdk_codebook_sitemap, pdk_codebook_page_start
 
