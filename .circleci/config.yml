@@ -15,7 +15,7 @@ jobs:
   build-38:
     docker:
       - image: cimg/python:3.8
-      - image: cimg/postgres:9.6-postgis
+      - image: cimg/postgres:12.18-postgis
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
@@ -40,7 +40,7 @@ jobs:
             mv project passive_data_kit_codebook
             mkdir django
             cd django
-            django-admin.py startproject pdk
+            django-admin startproject pdk
             mv ../passive_data_kit_codebook pdk
             cd pdk
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
