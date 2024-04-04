@@ -115,7 +115,7 @@ class DataPointType(models.Model):
     generator = models.CharField(max_length=1024, unique=True)
     name = models.CharField(max_length=1024, null=True, blank=True)
     category = models.CharField(max_length=1024, null=True, blank=True)
-    
+
     enabled = models.BooleanField(default=True)
 
     description = models.TextField(max_length=67108864, default='{}')
@@ -192,7 +192,7 @@ class DataPointType(models.Model):
 
                 if 'passive-data-metadata.generator-id' in definition:
                     name = pdk_api.data_type_name(definition)
-                    
+
                     if name is not None:
                         self.name = name
             except ImportError:
@@ -212,7 +212,7 @@ class DataPointType(models.Model):
 
                 if 'passive-data-metadata.generator-id' in definition:
                     category = pdk_api.data_type_category_for_identifier(definition['passive-data-metadata.generator-id'])
-                    
+
                     if category is not None:
                         self.category = category
             except ImportError:
