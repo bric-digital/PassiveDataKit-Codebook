@@ -1,5 +1,5 @@
 {% extends "pdk_base.html" %}
-{% load static from staticfiles %}
+{% load static %}
 {% load passive_data_kit %}
 {% load passive_data_kit_codebook %}
 
@@ -62,7 +62,7 @@
 						<tr>
 							<th scope="row">
 								<a href="#{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a><br />
-								{{ variable.pdk_codebook_key }}
+								<code>{{ variable.pdk_codebook_key }}</code>
 							</th>
 							<td>
 								{% if variable.pdk_variable_summary %}
@@ -91,7 +91,7 @@
 			{% for variable in group.1 %}
 				<div class="col-md-12">
 					<h4><a name="{{ variable.pdk_codebook_key }}">{{ variable.pdk_variable_name }}</a></h4>
-					<h5>{{ variable.pdk_codebook_key }}</h5>
+					<code>{{ variable.pdk_codebook_key }}</code>
 			
 					{{ variable.pdk_variable_description|codebook_markdown }}
 					
@@ -118,29 +118,52 @@
 									</ul>
 								{% endif %}
 							{% else %}
-								{% if 'timestamp' in variable.types %}
-									<p><strong>Timestamp, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
+								{% if 'object' in variable.types %}
+									<p><strong>Arbitrary data structure, expressed as a JSON object.</strong><p>
+
+									{% if variable.example %}
+										<p><strong>Example:</strong><p>
+										
+										<pre>{{ variable.example }}</pre>
+									{% endif %}
 								{% else %}
-									{% if 'file' in variable.types %}
-										<p><strong>Binary file data</strong><p>
+									{% if 'list' in variable.types %}
+										<p><strong>List, observed values (exhaustive):</strong><p>
+										<ul>
+											{% for value in variable.observed %}
+												<li>{{ value }}</li>
+											{% endfor %}
+										</ul>
 									{% else %}
-										{% if variable.range %}
-											<p><strong>Numeric value, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
+										{% if 'boolean' in variable.types %}
+											<p><strong>Boolean value, True or False.</strong><p>
 										{% else %}
-											{% if variable.pdk_labelled_ranges %}
-												<p><strong>Scored values, observed ranges:</strong><p>
-												<ul>
-													{% for range in variable.pdk_labelled_ranges %}
-														<li>{{ range.0 }}: {{ range.1.0 }} to {{ range.1.1 }}</li>
-													{% endfor %}
-												</ul>
+											{% if 'timestamp' in variable.types %}
+												<p><strong>Timestamp, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
 											{% else %}
-												{% if variable.pdk_labelled_ranges != None %}
-													<p><strong>Unable to score provided content. No score ranges available.</strong><p>
+												{% if 'file' in variable.types %}
+													<p><strong>Binary file data</strong><p>
 												{% else %}
-													<div>
-														<pre>{{ variable.pdk_codebook_json }}</pre>
-													</div>
+													{% if variable.range %}
+														<p><strong>Numeric value, ranges from {{ variable.range.0 }} to {{ variable.range.1 }}.</strong><p>
+													{% else %}
+														{% if variable.pdk_labelled_ranges %}
+															<p><strong>Scored values, observed ranges:</strong><p>
+															<ul>
+																{% for range in variable.pdk_labelled_ranges %}
+																	<li>{{ range.0 }}: {{ range.1.0 }} to {{ range.1.1 }}</li>
+																{% endfor %}
+															</ul>
+														{% else %}
+															{% if variable.pdk_labelled_ranges != None %}
+																<p><strong>Unable to score provided content. No score ranges available.</strong><p>
+															{% else %}
+																<div>
+																	<pre>{{ variable.pdk_codebook_json }}</pre>
+																</div>
+															{% endif %}
+														{% endif %}
+													{% endif %}
 												{% endif %}
 											{% endif %}
 										{% endif %}
