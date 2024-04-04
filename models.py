@@ -98,6 +98,10 @@ def update_definition(definition, element, prefix=None): # pylint: disable=too-m
 
 class DataPointType(models.Model):
     generator = models.CharField(max_length=1024, unique=True)
+    name = models.CharField(max_length=1024, null=True, blank=True)
+    category = models.CharField(max_length=1024, null=True, blank=True)
+    
+    enabled = models.BooleanField(default=True)
 
     description = models.TextField(max_length=67108864, default='{}')
 
@@ -117,7 +121,7 @@ class DataPointType(models.Model):
 
         data_generator = DataGeneratorDefinition.definition_for_identifier(self.generator)
 
-        point_query = DataPoint.objects.filter(generator_definition=data_generator)
+        point_query = DataPoint.objects.filter(generator_definition=data_generator).order_by('created')
 
         if sample > 0:
             point_query = point_query[:sample]
@@ -125,19 +129,26 @@ class DataPointType(models.Model):
         min_date = None
         max_date = None
 
-        for point in point_query:
-            point_def = point.fetch_properties()
+        point_count = point_query.count()
 
-            if 'passive-data-metadata' in point_def and 'generator-id' in point_def['passive-data-metadata']:
-                update_definition(definition, point_def)
+        point_index = 0
 
-                if min_date is None or point.created < min_date:
-                    min_date = point.created
+        while point_index < point_count:
+            for point in point_query[point_index:(point_index + 250)]:
+                point_def = point.fetch_properties()
 
-                if max_date is None or point.created > min_date:
-                    max_date = point.created
-            else:
-                print('[Error] Point pk=' + str(point.pk) + ' missing basic PDK metadata.')
+                if 'passive-data-metadata' in point_def and 'generator-id' in point_def['passive-data-metadata']:
+                    update_definition(definition, point_def)
+
+                    if min_date is None or point.created < min_date:
+                        min_date = point.created
+
+                    if max_date is None or point.created > min_date:
+                        max_date = point.created
+                else:
+                    print('[Error] Point pk=' + str(point.pk) + ' missing basic PDK metadata.')
+
+            point_index += 250
 
         original_definition = json.loads(self.definition)
 
@@ -153,6 +164,50 @@ class DataPointType(models.Model):
                 pass
             except AttributeError:
                 pass
+            except TypeError:
+                print('Error updating data type (%s):' % app)
+
+                traceback.print_exc()
+            except: #pylint: disable=bare-except
+                traceback.print_exc()
+
+        for app in settings.INSTALLED_APPS:
+            try:
+                pdk_api = importlib.import_module(app + '.pdk_api')
+
+                if 'passive-data-metadata.generator-id' in definition:
+                    name = pdk_api.data_type_name(definition)
+                    
+                    if name is not None:
+                        self.name = name
+            except ImportError:
+                pass
+            except AttributeError:
+                pass
+            except TypeError:
+                print('Error updating data type (%s):' % app)
+
+                traceback.print_exc()
+            except: #pylint: disable=bare-except
+                traceback.print_exc()
+
+        for app in settings.INSTALLED_APPS:
+            try:
+                pdk_api = importlib.import_module(app + '.pdk_api')
+
+                if 'passive-data-metadata.generator-id' in definition:
+                    category = pdk_api.data_type_category_for_identifier(definition['passive-data-metadata.generator-id'])
+                    
+                    if category is not None:
+                        self.category = category
+            except ImportError:
+                pass
+            except AttributeError:
+                pass
+            except TypeError:
+                print('Error updating data type (%s):' % app)
+
+                traceback.print_exc()
             except: #pylint: disable=bare-except
                 traceback.print_exc()
 
@@ -179,10 +234,18 @@ class DataPointType(models.Model):
 
         self.definition = json.dumps(definition, indent=2)
 
-        if self.first_seen is None or min_date < self.first_seen:
+        if min_date is None:
+            pass
+        elif self.first_seen is None:
+            self.first_seen = min_date
+        elif min_date < self.first_seen:
             self.first_seen = min_date
 
-        if self.last_seen is None or max_date < self.last_seen:
+        if max_date is None:
+            pass
+        elif self.last_seen is None:
+            self.last_seen = max_date
+        elif max_date < self.last_seen:
             self.last_seen = max_date
 
         self.save()

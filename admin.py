@@ -10,10 +10,20 @@ def reset_definition(modeladmin, request, queryset): # pylint: disable=unused-ar
 
 reset_definition.description = 'Reset definition'
 
+def disable_point(modeladmin, request, queryset): # pylint: disable=unused-argument
+    queryset.update(enabled=False)
+
+disable_point.description = 'Disable data type'
+
+def enable_point(modeladmin, request, queryset): # pylint: disable=unused-argument
+    queryset.update(enabled=True)
+
+enable_point.description = 'Enable data type'
+
 @admin.register(DataPointType)
 class DataPointTypeAdmin(admin.ModelAdmin):
-    list_display = ('generator', 'first_seen', 'last_seen',)
-    search_fields = ['generator', 'definition', 'description']
-    list_filter = ('first_seen', 'last_seen',)
+    list_display = ('generator', 'name', 'category', 'enabled', 'first_seen', 'last_seen',)
+    search_fields = ['generator', 'name', 'category', 'definition', 'description']
+    list_filter = ('enabled', 'first_seen', 'last_seen', 'category',)
 
-    actions = [reset_definition]
+    actions = [enable_point, disable_point, reset_definition]

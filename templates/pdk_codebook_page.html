@@ -4,17 +4,34 @@
 {% load passive_data_kit_codebook %}
 
 {% block sidebar %}
-    <ul class="nav nav-sidebar">
-        {% for other_type in data_types %}
-            <li><a href="{{ other_type.get_absolute_url }}">{{ other_type.generator }}</a></li>
-        {% endfor %}
-    </ul>
+   	{% for data_category in data_categories %}
+		<h4>{{ data_category.name }}</h4>
+		<ul class="nav nav-sidebar">
+			{% for category_data_type in data_category.data_types %}
+				<li>
+					{% if category_data_type.name %}
+						<a href="{{ category_data_type.get_absolute_url }}">
+							{{ category_data_type.name }}<br />
+							<small>{{ category_data_type.generator }}</small>
+						</a>
+					{% else %}
+						<a href="{{ category_data_type.get_absolute_url }}">{{ category_data_type.generator }}</a></li>
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	{% endfor %}
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <h1 class="sub-header">{{ data_type.generator }}</h1> 
+			{% if data_type.name %}
+	            <h1>{{ data_type.name }}</h1> 
+	            <h4 class="sub-header">{{ data_type.generator }}</h4>
+	        {% else %}
+	            <h1 class="sub-header">{{ data_type.generator }}</h1> 
+	        {% endif %}
         </div>
     </div>
 
@@ -51,7 +68,10 @@
 								{% if variable.pdk_variable_summary %}
 									{{ variable.pdk_variable_summary }}
 								{% else %}
-									{{ variable.pdk_variable_description }}
+									{{ variable.pdk_variable_description|codebook_markdown }}
+								{% endif %}
+								{% if variable.pdk_codebook_deprecated %}
+									<span class="text-info">Deprecated</span>
 								{% endif %}
 							</td>
 						</tr>
@@ -93,7 +113,7 @@
 									<p><strong>Text value, observed values (exhaustive):</strong><p>
 									<ul>
 										{% for value in variable.observed %}
-											<li>{{ value }}</li>
+											<li>{% codebook_observed_value value variable %}</li>
 										{% endfor %}
 									</ul>
 								{% endif %}
