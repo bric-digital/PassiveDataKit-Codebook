@@ -19,4 +19,4 @@ six==1.17.0
 deepdiff==3.3.0; python_version < '3.0'
 deepdiff==5.7.0; python_version == '3.6'
 deepdiff==6.7.1; python_version == '3.7'
-deepdiff==8.1.1; python_version >= '3.8'
+deepdiff==8.2.0; python_version >= '3.8'
