@@ -48,9 +48,8 @@ jobs:
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
             cp passive_data_kit_codebook/.pylintrc .
             cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pip install -r passive_data_kit/requirements.txt -r passive_data_kit_codebook/requirements.txt
             pylint passive_data_kit_codebook
-            pip install -r passive_data_kit/requirements.txt
-            pip install -r passive_data_kit_codebook/requirements.txt
             python manage.py migrate
             python manage.py test
             pylint passive_data_kit
@@ -99,9 +98,8 @@ jobs:
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
             cp passive_data_kit_codebook/.pylintrc .
             cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pip install -r passive_data_kit/requirements.txt -r passive_data_kit_codebook/requirements.txt
             pylint passive_data_kit_codebook
-            pip install -r passive_data_kit/requirements.txt
-            pip install -r passive_data_kit_codebook/requirements.txt
             python manage.py migrate
             python manage.py test
             pylint passive_data_kit
@@ -150,9 +148,8 @@ jobs:
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
             cp passive_data_kit_codebook/.pylintrc .
             cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pip install -r passive_data_kit/requirements.txt -r passive_data_kit_codebook/requirements.txt
             pylint passive_data_kit_codebook
-            pip install -r passive_data_kit/requirements.txt
-            pip install -r passive_data_kit_codebook/requirements.txt
             python manage.py migrate
             python manage.py test
             pylint passive_data_kit
@@ -201,9 +198,8 @@ jobs:
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
             cp passive_data_kit_codebook/.pylintrc .
             cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pip install -r passive_data_kit/requirements.txt -r passive_data_kit_codebook/requirements.txt
             pylint passive_data_kit_codebook
-            pip install -r passive_data_kit/requirements.txt
-            pip install -r passive_data_kit_codebook/requirements.txt
             python manage.py migrate
             python manage.py test
             pylint passive_data_kit
@@ -252,9 +248,8 @@ jobs:
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
             cp passive_data_kit_codebook/.pylintrc .
             cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pip install -r passive_data_kit/requirements.txt -r passive_data_kit_codebook/requirements.txt
             pylint passive_data_kit_codebook
-            pip install -r passive_data_kit/requirements.txt
-            pip install -r passive_data_kit_codebook/requirements.txt
             python manage.py migrate
             python manage.py test
             pylint passive_data_kit
@@ -301,8 +296,7 @@ jobs:
             mv ../passive_data_kit_codebook pdk
             cd pdk
             git clone https://github.com/audacious-software/PassiveDataKit-Django.git passive_data_kit
-            cp passive_data_kit_codebook/.pylintrc .
-            cp passive_data_kit_codebook/circle_settings.py pdk/settings.py
+            pip install -r passive_data_kit/requirements.txt -r passive_data_kit_codebook/requirements.txt
             pylint passive_data_kit_codebook
             pip install -r passive_data_kit/requirements.txt
             pip install -r passive_data_kit_codebook/requirements.txt
