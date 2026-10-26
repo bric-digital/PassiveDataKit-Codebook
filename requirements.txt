@@ -10,7 +10,7 @@ Markdown==3.4.4; python_version == '3.7'
 Markdown==3.7; python_version == '3.8'
 Markdown==3.9; python_version == '3.9'
 Markdown==3.10.3; python_version == '3.10'
-Markdown==3.11.1; python_version >= '3.11'
+Markdown==3.11.2; python_version >= '3.11'
 six==1.17.0
 deepdiff==3.3.0; python_version < '3.0'
 deepdiff==5.7.0; python_version == '3.6'
